@@ -1,16 +1,4 @@
-# grace_admin
+# Grace Admin Panel
 
-A new Flutter project.
+This is a flutter app to manage rotas for my church. It uses the supabase admin API. To adapt this for your own use you will need to create the appropriate tables, modify assets in the `assets/` directory and create a file in `lib/utils/constants.dart` to define the variables `anonKey` and `projectUrl`.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
