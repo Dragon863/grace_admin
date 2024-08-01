@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grace_admin/pages/rota_edit/rota_edit.dart';
 import 'package:grace_admin/pages/rota_edit/rota_edit_new.dart';
+import 'package:grace_admin/pages/rota_edit/rota_edit_panels.dart';
 import 'package:grace_admin/pages/splash/splash.dart';
 import 'package:grace_admin/utils/api.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Grace Admin',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
       home: const SplashPage(),
       routes: {
         '/splash': (context) => const SplashPage(),
-        '/home': (context) => const RotaEditPageNew(),
+        '/home': (context) => const PanelledRotaEditPage(),
       },
     );
   }

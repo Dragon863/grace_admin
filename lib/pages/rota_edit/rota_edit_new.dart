@@ -16,20 +16,28 @@ class _RotaEditPageNewState extends State<RotaEditPageNew> {
   void initState() {
     final inheritedApi = context.read<AuthAPI>();
     api = inheritedApi;
-    inheritedApi.client.auth.onAuthStateChange.listen((data) {
+    /*inheritedApi.client.auth.onAuthStateChange.listen((data) {
       final session = data.session;
       if (session == null) {
-        Navigator.of(context).pushReplacementNamed('/login');
+        Navigator.of(context).pushReplacementNamed('/splash');
       }
-    });
+    });*/
     super.initState();
   }
 
-  Future<List<Map<String, dynamic>>> fetchWeeks() async {
+  Future<List<Map>> fetchWeeks() async {
     final response = await api!.client
         .from('weeks')
-        .select('*, months(name), roles(*, profiles(name))');
-    return List<Map<String, dynamic>>.from(response as List);
+        .select('*, months(name), roles(*)')
+        .order('date');
+    for (var week in response) {
+      week['months'] = await api!.client
+          .from("months")
+          .select("*")
+          .eq("id", week['month_id'])
+          .single();
+    }
+    return List<Map>.from(response as List).reversed.toList(); 
   }
 
   @override
@@ -51,20 +59,20 @@ class _RotaEditPageNewState extends State<RotaEditPageNew> {
           )
         ],
       ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
+      body: FutureBuilder<List<Map>>(
         future: fetchWeeks(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           final weeksData = snapshot.data ?? [];
-          final groupedByMonth = <String, List<Map<String, dynamic>>>{};
+          final groupedByMonth = <String, List<Map>>{};
 
           for (var week in weeksData) {
-            final monthName = week['months']['name'] as String;
+            final monthName = week['months']['name'];
             if (!groupedByMonth.containsKey(monthName)) {
               groupedByMonth[monthName] = [];
             }
@@ -83,10 +91,11 @@ class _RotaEditPageNewState extends State<RotaEditPageNew> {
                   return buildMonthSection(
                     monthName,
                     weeks.map((week) {
+                      print(week);
                       final roles = (week['roles'] as List).map((role) {
                         final user = role['profiles'];
-                        return Person(
-                            user['name'], role['role'], role['is_unavailable']);
+                        return Person(user['name'], role['role'], false);
+                        // role['is_unavailable']);
                       }).toList();
 
                       return buildWeekCard(
@@ -163,9 +172,17 @@ class _RotaEditPageNewState extends State<RotaEditPageNew> {
             Text(description),
             Divider(),
             ListView(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              children: people.map((person) => buildPersonRow(person)).toList(),
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                children:
+                    people.map((person) => buildPersonRow(person)).toList()),
+            Center(
+              child: ListTile(
+                onTap: () async {},
+                title: const Text('Add Role',
+                    style: TextStyle(color: Colors.blue)),
+                leading: const Icon(Icons.add, color: Colors.blue),
+              ),
             ),
           ],
         ),
@@ -179,10 +196,10 @@ class _RotaEditPageNewState extends State<RotaEditPageNew> {
       child: Row(
         children: [
           CircleAvatar(
-            child: Icon(person.isUnavailable ? Icons.close : Icons.person),
             backgroundColor: person.isUnavailable ? Colors.red : Colors.blue,
+            child: Icon(person.isUnavailable ? Icons.close : Icons.person),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             person.name,
             style: TextStyle(
@@ -191,7 +208,7 @@ class _RotaEditPageNewState extends State<RotaEditPageNew> {
                   : TextDecoration.none,
             ),
           ),
-          Spacer(),
+          const Spacer(),
           Text(person.role),
         ],
       ),
@@ -206,3 +223,12 @@ class Person {
 
   Person(this.name, this.role, [this.isUnavailable = false]);
 }
+
+/*
+ListTile(
+  onTap: () async {},
+  title: const Text('Log Out',
+      style: TextStyle(color: Colors.red)),
+  leading: const Icon(Icons.logout, color: Colors.red),
+),
+*/
