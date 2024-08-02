@@ -23,7 +23,9 @@ class MyApp extends StatelessWidget {
       title: 'Grace Admin',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue, //const Color.fromARGB(255, 32, 109, 156),
+        ),
         useMaterial3: true,
       ),
       home: const SplashPage(),
