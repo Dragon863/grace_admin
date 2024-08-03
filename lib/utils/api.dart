@@ -42,11 +42,16 @@ class AuthAPI extends ChangeNotifier {
 
   Future<bool> loginAsAdmin({required String serviceKey}) async {
     try {
-      final supabaseAdmin = SupabaseClient(
-        projectUrl,
-        serviceKey,
-      );
+      final supabaseAdmin = SupabaseClient(projectUrl, serviceKey,
+          authOptions: const AuthClientOptions(
+            autoRefreshToken: false,
+          ));
+      await client.auth.signInWithPassword(password: servicePassword, email: serviceEmail);
 
+      await supabaseAdmin.auth.admin.listUsers();
+      // If this works, we're authenticated
+
+      print(supabaseAdmin.auth.currentSession);
       _status = AccountStatus.authenticated;
       _currentUser = supabaseAdmin;
       return true;

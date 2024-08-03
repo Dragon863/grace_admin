@@ -4,12 +4,14 @@ class DutyCard extends StatefulWidget {
   final String title;
   final String description;
   final DateTime time;
+  final Function? onRemovePressed;
 
   const DutyCard({
     super.key,
     required this.title,
     required this.description,
     required this.time,
+    this.onRemovePressed,
   });
 
   @override
@@ -33,16 +35,30 @@ class _DutyCardState extends State<DutyCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "${widget.time.hour}:${widget.time.minute}",
-                  style: const TextStyle(fontSize: 16, color: Colors.blue),
-                ),
-                Text(widget.description),
+                Row(children: [
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.title,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "${widget.time.hour}:${widget.time.minute}",
+                          style:
+                              const TextStyle(fontSize: 16, color: Colors.blue),
+                        ),
+                      ]),
+                  const Spacer(),
+                  IconButton(
+                    splashRadius: 25,
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: widget.onRemovePressed as void Function()?,
+                  ),
+                ]),
+
+                //Text(widget.description),
                 const Divider(),
                 DragTarget<List<String>>(
                   builder: (

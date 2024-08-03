@@ -204,8 +204,10 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
                           DutyCard(
                             title: "Coffee Duty",
                             description: "No description",
-                            time: DateTime.now(),
+                            time: DateTime.now()
+                                .subtract(const Duration(minutes: 10)),
                           )
+                          // TODO: Dynamically add duties from DB
                         ],
                       )
                     ],
@@ -217,7 +219,9 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, "/duty_library");
+        },
         // Squircle
 
         icon: const Icon(Icons.add),

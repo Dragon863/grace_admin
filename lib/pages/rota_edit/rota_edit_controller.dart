@@ -3,7 +3,7 @@ import 'package:grace_admin/utils/api.dart';
 
 Future<List<Widget>> searchUsers(String searchTerm, AuthAPI api) async {
   final List<List<String>> users = await api.getAllUsers();
-  // Example data: [[Daniel Benge, 703c9cc2-1da3-478a-8924-18506550cce6]]
+  // Example data: [[User's Name, ffffffff-ffff-ffff-ffff-ffffffffffff]]
   List<List<String>> matchingUsers;
 
   if (searchTerm.isNotEmpty) {
@@ -42,4 +42,3 @@ Future<List<Widget>> searchUsers(String searchTerm, AuthAPI api) async {
       )
       .toList();
 }
-
