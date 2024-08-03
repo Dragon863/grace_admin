@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:grace_admin/pages/rota_edit/duty_card.dart';
 import 'package:grace_admin/pages/rota_edit/rota_edit_controller.dart';
 import 'package:grace_admin/utils/api.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,12 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
     _searchFocusNode.dispose();
     _debounce?.cancel();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    _onSearchChanged(""); // Lists all users
+    super.initState();
   }
 
   void _onSearchChanged(String query) {
@@ -181,29 +188,30 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
           ),
           Container(
             width: MediaQuery.of(context).size.width * 0.7,
-            child: Column(
-              children: [
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Card(
-                          child: Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.work),
-                                  const SizedBox(width: 10),
-                                  Text("Duty Name"),
-                                ],
-                              )), // TODO: create separate card for this
-                        ))
-                      ],
-                    )
-                  ],
-                )
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          DutyCard(
+                            title: "Cleaning Duty",
+                            description: "No description",
+                            time: DateTime.now(),
+                          ),
+                          DutyCard(
+                            title: "Coffee Duty",
+                            description: "No description",
+                            time: DateTime.now(),
+                          )
+                        ],
+                      )
+                    ],
+                  )
+                ],
+              ),
             ),
           )
         ],
