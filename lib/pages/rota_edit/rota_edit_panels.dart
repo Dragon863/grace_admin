@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:grace_admin/pages/rota_edit/duty_card.dart';
+import 'package:grace_admin/pages/rota_edit/widgets/duty_card.dart';
 import 'package:grace_admin/pages/rota_edit/rota_edit_controller.dart';
 import 'package:grace_admin/utils/api.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +19,7 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   Timer? _debounce;
+  List<Widget> _dutyCards = [];
 
   @override
   void dispose() {
@@ -31,6 +32,7 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
   @override
   void initState() {
     _onSearchChanged(""); // Lists all users
+    _loadDutyCards();
     super.initState();
   }
 
@@ -41,6 +43,31 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
       setState(() {
         searchResults = widgetResults;
       });
+    });
+  }
+
+  DutyCard buildDutyCardFromDuty(Map duty) {
+    return DutyCard(
+      title: duty["title"],
+      description: duty["description"] ?? "No Description",
+      time: DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+        int.parse(duty["time"].split(":")[0]),
+        int.parse(duty["time"].split(":")[1]),
+      ),
+    );
+  }
+
+  void _loadDutyCards() async {
+    final duties = await context.read<AuthAPI>().client.from("duties").select();
+    final List<Widget> cards = [];
+    for (final duty in duties) {
+      cards.add(buildDutyCardFromDuty(duty));
+    }
+    setState(() {
+      _dutyCards = cards;
     });
   }
 
@@ -195,20 +222,7 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
                   Column(
                     children: [
                       Row(
-                        children: [
-                          DutyCard(
-                            title: "Cleaning Duty",
-                            description: "No description",
-                            time: DateTime.now(),
-                          ),
-                          DutyCard(
-                            title: "Coffee Duty",
-                            description: "No description",
-                            time: DateTime.now()
-                                .subtract(const Duration(minutes: 10)),
-                          )
-                          // TODO: Dynamically add duties from DB
-                        ],
+                        children: _dutyCards,
                       )
                     ],
                   )
@@ -219,11 +233,12 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.pushNamed(context, "/duty_library");
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, "/duty_library");
+          if (result != null) {
+            print(result);
+          }
         },
-        // Squircle
-
         icon: const Icon(Icons.add),
         label: const Text("Add Duty"),
       ),

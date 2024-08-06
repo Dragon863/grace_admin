@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DutyCard extends StatefulWidget {
   final String title;
@@ -45,7 +46,7 @@ class _DutyCardState extends State<DutyCard> {
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          "${widget.time.hour}:${widget.time.minute}",
+                          DateFormat('HH:MM').format(widget.time),
                           style:
                               const TextStyle(fontSize: 16, color: Colors.blue),
                         ),
