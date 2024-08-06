@@ -3,9 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:grace_admin/pages/rota_edit/widgets/duty_card.dart';
 import 'package:grace_admin/pages/rota_edit/rota_edit_controller.dart';
 import 'package:grace_admin/utils/api.dart';
+import 'package:grace_admin/utils/popup.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'dart:async';
+import 'package:uuid/uuid.dart';
 
 class PanelledRotaEditPage extends StatefulWidget {
   const PanelledRotaEditPage({super.key});
@@ -59,58 +61,96 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
         int.parse(duty["time"].split(":")[0]),
         int.parse(duty["time"].split(":")[1]),
       ),
-      onRemovePressed: () {
+      onRemovePressed: () async {
         setState(() {
           _dutyCards.removeWhere((element) => element.id == duty["id"]);
         });
+        // Delete with API
+        final api = context.read<AuthAPI>();
+        await api.client.from("roles").delete().eq("id", duty['row_id']);
       },
       id: duty["id"],
+      row_id: duty["row_id"],
+      acceptedUser: duty["accepted_user"],
     );
   }
 
   void _loadDutyCards() async {
-    loading = true;
-    List toReturn = [];
+    setState(() {
+      loading = true;
+    });
+    List<DutyCard> toReturn = [];
     final roles =
         await context.read<AuthAPI>().client.from("roles").select("*").eq(
               "date",
               selectedDate.toIso8601String().split("T")[0],
             );
     for (final record in roles) {
-      final user = await context
-          .read<AuthAPI>()
-          .client
-          .from("profiles")
-          .select("name")
-          .eq("id", duty["profile_id"]);
       final duty = await context
           .read<AuthAPI>()
           .client
           .from("duties")
           .select("*")
-          .eq("id", record["duty_id"]);
+          .eq("id", record["duty_id"])
+          .single();
+
+      if (record['profile_id'] != null) {
+        final user = await context
+            .read<AuthAPI>()
+            .client
+            .from("profiles")
+            .select("full_name")
+            .eq("id", record["profile_id"])
+            .single();
+        duty["accepted_user"] = <String>[
+          user["full_name"],
+          record["profile_id"]
+        ];
+        duty["row_id"] = record["id"];
+        toReturn.add(buildDutyCardFromDuty(duty));
+        setState(() {
+          loading = false;
+        });
+      } else {
+        duty["row_id"] = record["id"];
+        toReturn.add(buildDutyCardFromDuty(duty));
+        setState(() {
+          loading = false;
+        });
+      }
     }
-    print(duties);
-    /*final List<DutyCard> cards = [];
-    for (final duty in duties) {
-      cards.add(buildDutyCardFromDuty(duty));
-    }
+
     setState(() {
-      _dutyCards = cards;
+      _dutyCards = toReturn;
       loading = false;
-    });*/
+    });
   }
 
   void _saveAllDuties() async {
-    final api = context.read<AuthAPI>();
-    for (final DutyCard duty in _dutyCards) {
-      final dutyData = {
-        "id": duty.id,
-        "title": duty.title,
-        "description": duty.description,
-        "time": duty.time.toString(),
-      };
-      await api.client.from("roles").upsert(dutyData);
+    try {
+      final api = context.read<AuthAPI>();
+      print("Saving duties");
+
+      // Collect all duty data
+      List<Map<String, dynamic>> dutiesData = _dutyCards.map((card) {
+        return {
+          "id": card.row_id, // Now include the primary key :)
+          "duty_id": card.id,
+          "profile_id":
+              card.acceptedUser != null ? card.acceptedUser![1] : null,
+          "date": selectedDate.toIso8601String().split("T")[0],
+        };
+      }).toList();
+
+      // Perform batch update
+      try {
+        await api.client.from("roles").upsert(dutiesData, onConflict: "id");
+        print("Duties saved successfully");
+      } catch (e) {
+        print("Error saving duties: $e");
+      }
+    } catch (e) {
+      showErr(context, "Error whilst saving: ${e.toString()}");
     }
   }
 
@@ -137,163 +177,169 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
           )
         ],
       ),
-      body: Row(
+      body: Stack(
         children: [
-          Container(
-            width: MediaQuery.of(context).size.width * 0.3,
-            decoration: const BoxDecoration(
-                border: Border(
-              right: BorderSide(
-                color: Color.fromARGB(255, 32, 109, 156),
-                width: 2.0,
-              ),
-            )),
-            child: Column(
-              children: [
-                Expanded(
-                  child: SfDateRangePicker(
-                    onSelectionChanged:
-                        (DateRangePickerSelectionChangedArgs args) {
-                      selectedDate = args.value;
-                    },
-                    selectionMode: DateRangePickerSelectionMode.single,
-                    initialSelectedDate: DateTime.now(),
-                    selectionColor: const Color.fromARGB(255, 32, 109, 156),
-                    selectionTextStyle: GoogleFonts.rubik(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    headerStyle: DateRangePickerHeaderStyle(
-                      textAlign: TextAlign.center,
-                      backgroundColor:
-                          Theme.of(context).scaffoldBackgroundColor,
-                      textStyle: const TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold),
-                    ),
-                    headerHeight: 70,
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    showNavigationArrow: true,
-                    monthViewSettings: DateRangePickerMonthViewSettings(
-                      viewHeaderHeight: 50,
-                      viewHeaderStyle: DateRangePickerViewHeaderStyle(
-                        textStyle: GoogleFonts.rubik(
+          Row(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width * 0.3,
+                decoration: const BoxDecoration(
+                    border: Border(
+                  right: BorderSide(
+                    color: Color.fromARGB(255, 32, 109, 156),
+                    width: 2.0,
+                  ),
+                )),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SfDateRangePicker(
+                        onSelectionChanged:
+                            (DateRangePickerSelectionChangedArgs args) {
+                          selectedDate = args.value;
+                          setState(() {
+                            _dutyCards = [];
+                            _loadDutyCards();
+                          });
+                        },
+                        selectionMode: DateRangePickerSelectionMode.single,
+                        initialSelectedDate: DateTime.now(),
+                        selectionColor: const Color.fromARGB(255, 32, 109, 156),
+                        selectionTextStyle: GoogleFonts.rubik(
                           fontWeight: FontWeight.bold,
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: Color.fromARGB(255, 32, 109, 156),
-                        width: 2.0,
-                      ),
-                    ),
-                  ),
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        SearchBar(
-                          hintText: "Search Users",
-                          controller: _searchController,
-                          focusNode: _searchFocusNode,
-                          padding: WidgetStateProperty.all<EdgeInsets>(
-                              const EdgeInsets.symmetric(horizontal: 15)),
-                          leading: const Icon(Icons.search),
-                          shadowColor: WidgetStateColor.transparent,
-                          onChanged: _onSearchChanged,
+                        headerStyle: DateRangePickerHeaderStyle(
+                          textAlign: TextAlign.center,
+                          backgroundColor:
+                              Theme.of(context).scaffoldBackgroundColor,
+                          textStyle: const TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 5),
-                        Expanded(
-                          child: ListView(
-                            shrinkWrap: true,
-                            children: searchResults,
+                        headerHeight: 70,
+                        backgroundColor:
+                            Theme.of(context).scaffoldBackgroundColor,
+                        showNavigationArrow: true,
+                        monthViewSettings: DateRangePickerMonthViewSettings(
+                          viewHeaderHeight: 50,
+                          viewHeaderStyle: DateRangePickerViewHeaderStyle(
+                            textStyle: GoogleFonts.rubik(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                        Row(
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.save),
-                              label: const Text(
-                                "Save",
-                              ),
-                              onPressed: () {},
-                            ),
-                            const Spacer(),
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.delete_forever),
-                              label: const Text(
-                                "Discard",
-                              ),
-                              onPressed: () {},
-                            ),
-                            const Spacer(),
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.undo),
-                              label: const Text(
-                                "Undo",
-                              ),
-                              onPressed: () {},
-                            ),
-                            const Spacer(),
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.redo),
-                              label: const Text(
-                                "Redo",
-                              ),
-                              onPressed: () {
-                                _loadDutyCards();
-                              },
-                            ),
-                          ],
-                        )
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.7,
-            child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _dutyCards.isEmpty
-                    ? loading
-                        ? const Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : const Center(
-                            child: Text(
-                              "No Duties Added",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: Color.fromARGB(255, 32, 109, 156),
+                            width: 2.0,
+                          ),
+                        ),
+                      ),
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            SearchBar(
+                              hintText: "Search Users",
+                              controller: _searchController,
+                              focusNode: _searchFocusNode,
+                              padding: WidgetStateProperty.all<EdgeInsets>(
+                                  const EdgeInsets.symmetric(horizontal: 15)),
+                              leading: const Icon(Icons.search),
+                              shadowColor: WidgetStateColor.transparent,
+                              onChanged: _onSearchChanged,
+                            ),
+                            const SizedBox(height: 5),
+                            Expanded(
+                              child: ListView(
+                                shrinkWrap: true,
+                                children: searchResults,
                               ),
                             ),
-                          )
-                    : GridView.builder(
-                        itemBuilder: (context, index) => _dutyCards[index],
-                        itemCount: _dutyCards.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisExtent: 190,
+                            Row(
+                              children: [
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.save),
+                                  label: const Text(
+                                    "Save",
+                                  ),
+                                  onPressed: _saveAllDuties,
+                                ),
+                                const Spacer(),
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.refresh),
+                                  label: const Text(
+                                    "Reload",
+                                  ),
+                                  onPressed: () {
+                                    _loadDutyCards();
+                                  },
+                                ),
+                              ],
+                            )
+                          ],
                         ),
-                        // Magic numbers. Don't touch.
-                      )),
-          )
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.7,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _dutyCards.isEmpty
+                      ? loading
+                          ? const Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : const Center(
+                              child: Text(
+                                "No Duties Added",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            )
+                      : GridView.builder(
+                          itemBuilder: (context, index) => _dutyCards[index],
+                          itemCount: _dutyCards.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisExtent: 190,
+                          ),
+                          // Magic numbers. Don't touch.
+                        ),
+                ),
+              )
+            ],
+          ),
+          if (loading)
+            ModalBarrier(
+              dismissible: false,
+              color: Colors.black.withOpacity(0.2),
+            ),
+          if (loading)
+            const Center(
+              child: Text("Loading..."),
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          final result = await Navigator.pushNamed(context, "/duty_library");
+          final passedData =
+              await Navigator.pushNamed(context, "/duty_library");
+          final result = passedData as Map?;
           if (result != null) {
-            final duty = buildDutyCardFromDuty(result as Map);
+            result["row_id"] = const Uuid().v4();
+            final duty = buildDutyCardFromDuty(result);
             setState(() {
               _dutyCards.add(duty);
             });

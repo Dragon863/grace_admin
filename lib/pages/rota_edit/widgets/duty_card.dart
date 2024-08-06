@@ -1,21 +1,26 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class DutyCard extends StatefulWidget {
   final String title;
   final String description;
   final DateTime time;
   final Function onRemovePressed;
   final String id;
-  final List<String>? acceptedUser;
+  final String? row_id;
+  List<String>? acceptedUser;
 
-  const DutyCard({
+  DutyCard({
     super.key,
     required this.title,
     required this.description,
     required this.time,
     required this.onRemovePressed,
     required this.id,
+    required this.row_id,
     this.acceptedUser,
   });
 
@@ -56,7 +61,8 @@ class _DutyCardState extends State<DutyCard> {
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    DateFormat('HH:MM').format(widget.time),
+                    DateFormat('HH:mm').format(widget.time),
+                    // *Not* "HH:MM". I spent far too long debugging that.
                     style: const TextStyle(fontSize: 16, color: Colors.blue),
                   ),
                 ]),
@@ -104,6 +110,8 @@ class _DutyCardState extends State<DutyCard> {
                 onAcceptWithDetails: (details) {
                   setState(() {
                     acceptedUser = details.data;
+                    widget.acceptedUser = acceptedUser;
+                    print(acceptedUser);
                   });
                 },
                 onWillAcceptWithDetails: (data) {
