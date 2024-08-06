@@ -19,7 +19,9 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   Timer? _debounce;
-  List<Widget> _dutyCards = [];
+  List<DutyCard> _dutyCards = [];
+  bool loading = false;
+  DateTime selectedDate = DateTime.now();
 
   @override
   void dispose() {
@@ -31,9 +33,9 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
 
   @override
   void initState() {
-    _onSearchChanged(""); // Lists all users
-    _loadDutyCards();
+    _onSearchChanged(""); // Lists all users rather than searching
     super.initState();
+    _loadDutyCards();
   }
 
   void _onSearchChanged(String query) {
@@ -57,18 +59,59 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
         int.parse(duty["time"].split(":")[0]),
         int.parse(duty["time"].split(":")[1]),
       ),
+      onRemovePressed: () {
+        setState(() {
+          _dutyCards.removeWhere((element) => element.id == duty["id"]);
+        });
+      },
+      id: duty["id"],
     );
   }
 
   void _loadDutyCards() async {
-    final duties = await context.read<AuthAPI>().client.from("duties").select();
-    final List<Widget> cards = [];
+    loading = true;
+    List toReturn = [];
+    final roles =
+        await context.read<AuthAPI>().client.from("roles").select("*").eq(
+              "date",
+              selectedDate.toIso8601String().split("T")[0],
+            );
+    for (final record in roles) {
+      final user = await context
+          .read<AuthAPI>()
+          .client
+          .from("profiles")
+          .select("name")
+          .eq("id", duty["profile_id"]);
+      final duty = await context
+          .read<AuthAPI>()
+          .client
+          .from("duties")
+          .select("*")
+          .eq("id", record["duty_id"]);
+    }
+    print(duties);
+    /*final List<DutyCard> cards = [];
     for (final duty in duties) {
       cards.add(buildDutyCardFromDuty(duty));
     }
     setState(() {
       _dutyCards = cards;
-    });
+      loading = false;
+    });*/
+  }
+
+  void _saveAllDuties() async {
+    final api = context.read<AuthAPI>();
+    for (final DutyCard duty in _dutyCards) {
+      final dutyData = {
+        "id": duty.id,
+        "title": duty.title,
+        "description": duty.description,
+        "time": duty.time.toString(),
+      };
+      await api.client.from("roles").upsert(dutyData);
+    }
   }
 
   @override
@@ -111,7 +154,7 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
                   child: SfDateRangePicker(
                     onSelectionChanged:
                         (DateRangePickerSelectionChangedArgs args) {
-                      print(args.value);
+                      selectedDate = args.value;
                     },
                     selectionMode: DateRangePickerSelectionMode.single,
                     initialSelectedDate: DateTime.now(),
@@ -202,7 +245,9 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
                               label: const Text(
                                 "Redo",
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                _loadDutyCards();
+                              },
                             ),
                           ],
                         )
@@ -213,22 +258,34 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
               ],
             ),
           ),
-          Container(
+          SizedBox(
             width: MediaQuery.of(context).size.width * 0.7,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Column(
-                    children: [
-                      Row(
-                        children: _dutyCards,
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
+                padding: const EdgeInsets.all(8.0),
+                child: _dutyCards.isEmpty
+                    ? loading
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : const Center(
+                            child: Text(
+                              "No Duties Added",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                    : GridView.builder(
+                        itemBuilder: (context, index) => _dutyCards[index],
+                        itemCount: _dutyCards.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisExtent: 190,
+                        ),
+                        // Magic numbers. Don't touch.
+                      )),
           )
         ],
       ),
@@ -236,7 +293,10 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
         onPressed: () async {
           final result = await Navigator.pushNamed(context, "/duty_library");
           if (result != null) {
-            print(result);
+            final duty = buildDutyCardFromDuty(result as Map);
+            setState(() {
+              _dutyCards.add(duty);
+            });
           }
         },
         icon: const Icon(Icons.add),
