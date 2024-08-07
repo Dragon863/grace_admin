@@ -186,12 +186,13 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
               Container(
                 width: MediaQuery.of(context).size.width * 0.3,
                 decoration: const BoxDecoration(
-                    border: Border(
-                  right: BorderSide(
-                    color: Color.fromARGB(255, 32, 109, 156),
-                    width: 2.0,
+                  border: Border(
+                    right: BorderSide(
+                      color: Color.fromARGB(255, 32, 109, 156),
+                      width: 2.0,
+                    ),
                   ),
-                )),
+                ),
                 child: Column(
                   children: [
                     Expanded(
