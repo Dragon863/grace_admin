@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:grace_admin/pages/duty_library/duty_library_controller.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:grace_admin/pages/duty_library/widgets/duty_tile.dart';
 import 'package:grace_admin/utils/api.dart';
 import 'package:provider/provider.dart';
@@ -164,10 +164,10 @@ class _DutyLibraryPageState extends State<DutyLibraryPage> {
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
+              Text(
                 'Grace Admin Panel - Duty Library',
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: GoogleFonts.rubik(
+                    color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ],
           ),

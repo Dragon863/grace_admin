@@ -61,6 +61,7 @@ class _LoginViewState extends State<LoginView> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: TextField(
+                    autofocus: true,
                     obscureText: true,
                     obscuringCharacter: '*',
                     enableSuggestions: false,

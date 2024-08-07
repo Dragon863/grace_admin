@@ -158,14 +158,16 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
+        title: Center(
           child: Text(
             'Grace Admin Panel',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: GoogleFonts.rubik(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
         backgroundColor: const Color.fromARGB(255, 32, 109, 156),
-        automaticallyImplyLeading: false,
+        // automaticallyImplyLeading: false,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),

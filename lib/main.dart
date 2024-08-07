@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grace_admin/pages/dashboard/dashboard.dart';
 import 'package:grace_admin/pages/duty_library/duty_library.dart';
 import 'package:grace_admin/pages/rota_edit/rota_edit_panels.dart';
 import 'package:grace_admin/pages/splash/splash.dart';
@@ -30,8 +31,9 @@ class MyApp extends StatelessWidget {
       home: const SplashPage(),
       routes: {
         '/splash': (context) => const SplashPage(),
-        '/home': (context) => const PanelledRotaEditPage(),
+        '/home': (context) => const DashboardPage(),
         '/duty_library': (context) => const DutyLibraryPage(),
+        '/rota_edit': (context) => const PanelledRotaEditPage(),
       },
     );
   }

@@ -20,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
         isScrollControlled: true,
         isDismissible: false,
         enableDrag: false,
-        
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topRight: Radius.circular(42),
