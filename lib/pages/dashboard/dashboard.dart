@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grace_admin/pages/dashboard/widgets/menu_item.dart';
-import 'package:grace_admin/pages/dashboard/widgets/top_card.dart';
 import 'package:grace_admin/utils/api.dart';
 import 'package:provider/provider.dart';
 
@@ -143,55 +142,45 @@ class _DashboardPageState extends State<DashboardPage> {
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.8,
               height: MediaQuery.of(context).size.height,
-              child: Column(
-                children: [
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Welcome to Grace Admin Panel',
-                            style: GoogleFonts.rubik(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Text(
+                          "👋",
+                          style: GoogleFonts.notoColorEmoji(
+                            fontSize: 40,
                           ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'This is the admin panel for Grace, a duty management system for the NHS. '
-                            'You can manage users, duties, and rota templates here.',
-                            style: GoogleFonts.rubik(
-                              fontSize: 16,
-                            ),
+                        ),
+                        Text(
+                          " Welcome! Let's get started...",
+                          style: GoogleFonts.rubik(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Text(
+                        "Welcome to the Grace Admin Panel. Use the menu on the left to navigate. From here you can manage users, rotas, and the event log. ",
+                        style: GoogleFonts.rubik(
+                          fontSize: 16,
+                        ),
                       ),
                     ),
-                  ),
-                  const Spacer(),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TopCard(
-                        title: 'Users',
-                        subtitle: 'Manage users',
-                        icon: Icon(Icons.people_outline),
-                      ),
-                      TopCard(
-                        title: 'Duties',
-                        subtitle: 'Manage duties',
-                        icon: Icon(Icons.work_outline),
-                      ),
-                      TopCard(
-                        title: 'Rota Templates',
-                        subtitle: 'Manage rota templates',
-                        icon: Icon(Icons.format_list_bulleted),
-                      )
-                    ],
-                  ),
-                  const Spacer(),
-                ],
+                    const Spacer(
+                      flex: 2,
+                    ),
+                  ],
+                ),
               ),
             )
           ],

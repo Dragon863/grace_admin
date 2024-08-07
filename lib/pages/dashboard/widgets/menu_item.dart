@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DashMenuItem extends StatelessWidget {
   final String title;
@@ -23,7 +24,7 @@ class DashMenuItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: ListTile(
-        title: Text(title, style: const TextStyle(color: Colors.black)),
+        title: Text(title, style: GoogleFonts.rubik(color: Colors.black)),
         leading: Icon(iconData, color: Colors.black),
         onTap: () {
           onTap!();
