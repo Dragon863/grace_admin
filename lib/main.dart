@@ -3,6 +3,7 @@ import 'package:grace_admin/pages/dashboard/dashboard.dart';
 import 'package:grace_admin/pages/duty_library/duty_library.dart';
 import 'package:grace_admin/pages/rota_edit/rota_edit_panels.dart';
 import 'package:grace_admin/pages/splash/splash.dart';
+import 'package:grace_admin/pages/feed_page/feed_page.dart';
 import 'package:grace_admin/pages/users_page/users_page.dart';
 import 'package:grace_admin/utils/api.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/duty_library': (context) => const DutyLibraryPage(),
         '/rota_edit': (context) => const PanelledRotaEditPage(),
         '/users': (context) => const UsersPage(),
+        '/feed': (context) => const FeedPage(),
       },
     );
   }
