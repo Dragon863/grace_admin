@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:grace_admin/pages/feed_page/preview/card.dart';
 import 'package:grace_admin/utils/api.dart';
@@ -42,7 +40,7 @@ class _PreviewFeedState extends State<PreviewFeed> {
           future: fetchEvents(false),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -50,36 +48,34 @@ class _PreviewFeedState extends State<PreviewFeed> {
             } else {
               return Container(
                 constraints: const BoxConstraints(minWidth: 150, maxWidth: 700),
-                child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(
-                    dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    },
-                  ),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
-                    ),
-                    itemBuilder: (context, index) {
-                      final event = snapshot.data![index];
-                      String? imageUrl;
-                      if (event['image'] != null) {
-                        final api = context.read<AuthAPI>();
-                        imageUrl = api.getImgUrl(event['image'], 'events');
-                      }
-                      return EventCard(
-                        title: event['title'],
-                        subtext: event['subtext'],
-                        date: event['datecreated']
-                            .toString()
-                            .replaceAll("-", "."),
-                        imageUrl: imageUrl,
-                      );
-                    },
-                  ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final event = snapshot.data![index];
+                    String? imageUrl;
+                    if (event['image'] != null) {
+                      final api = context.read<AuthAPI>();
+                      imageUrl = api.getImgUrl(event['image'], 'events');
+                    }
+                    return EventCard(
+                      title: event['title'],
+                      subtext: event['subtext'],
+                      date:
+                          event['datecreated'].toString().replaceAll("-", "."),
+                      imageUrl: imageUrl,
+                      onDelete: () async {
+                        await supabase
+                            .from('events')
+                            .delete()
+                            .eq('id', event['id']);
+                        setState(() {
+                          content = null;
+                        });
+                      },
+                      buttons: event['buttons'],
+                    );
+                  },
                 ),
               );
             }

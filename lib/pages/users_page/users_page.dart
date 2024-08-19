@@ -63,8 +63,9 @@ class _UsersPageState extends State<UsersPage> {
     final users = await api.getAllUsers();
     final onboardedUsers = users.where((user) => user[1] != "").toList();
     setState(() {
-      _totalUsers = users.length;
-      _onboardedUsers = onboardedUsers.length;
+      // Subtract 1 to account for the admin service account
+      _totalUsers = users.length - 1;
+      _onboardedUsers = onboardedUsers.length - 1;
     });
   }
 
@@ -186,6 +187,17 @@ class _UsersPageState extends State<UsersPage> {
                         ),
                       ),
                     ],
+                  ),
+                  const Spacer(),
+                  FilledButton(
+                    onPressed: refreshData,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 32, 109, 156),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                    ),
+                    child: const Text("Refresh Data"),
                   ),
                 ],
               ),

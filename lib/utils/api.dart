@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'constants.dart';
@@ -74,6 +75,8 @@ class AuthAPI extends ChangeNotifier {
   signOut() async {
     try {
       await _currentUser.auth.signOut();
+      final sharedPrefsInstance = await SharedPreferences.getInstance();
+      await sharedPrefsInstance.clear();
       _status = AccountStatus.unauthenticated;
     } finally {
       notifyListeners();

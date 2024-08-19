@@ -135,6 +135,14 @@ class _DashboardPageState extends State<DashboardPage> {
                       },
                       selected: false,
                     ),
+                    DashMenuItem(
+                      title: 'Translation',
+                      iconData: Icons.translate,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/translate');
+                      },
+                      selected: false,
+                    ),
                   ],
                 ),
               ),
@@ -170,7 +178,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     Padding(
                       padding: const EdgeInsets.all(18.0),
                       child: Text(
-                        "Welcome to the Grace Admin Panel. Use the menu on the left to navigate. From here you can manage users, rotas, and the event log. ",
+                        "Welcome to the Grace Admin Panel. Use the menu on the left to navigate. From here you can manage users, rotas, and the main feed. ",
                         style: GoogleFonts.rubik(
                           fontSize: 16,
                         ),

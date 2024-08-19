@@ -10,9 +10,11 @@ Future<List<Widget>> searchUsers(String searchTerm, AuthAPI api) async {
     matchingUsers = users
         .where(
             (user) => user[0].toLowerCase().contains(searchTerm.toLowerCase()))
+        .where((user) => user[0] != "Admin Service Account")
         .toList();
   } else {
-    matchingUsers = users;
+    matchingUsers =
+        users.where((user) => user[0] != "Admin Service Account").toList();
   }
   return matchingUsers
       .map(

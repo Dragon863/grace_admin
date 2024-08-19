@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grace_admin/pages/feed_page/preview/helpers/fullscreen_image.dart';
+import 'package:grace_admin/pages/login/color_helper.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class EventCard extends StatelessWidget {
@@ -10,6 +11,8 @@ class EventCard extends StatelessWidget {
   final String? subtext;
   final String? imageUrl;
   final String? url;
+  final Map? buttons;
+  final void Function()? onDelete;
 
   const EventCard({
     super.key,
@@ -18,6 +21,8 @@ class EventCard extends StatelessWidget {
     this.imageUrl,
     this.subtext,
     this.url,
+    this.buttons,
+    this.onDelete,
   });
 
   @override
@@ -99,6 +104,28 @@ class EventCard extends StatelessWidget {
                     ],
                   ),
             const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: IconButton(
+                onPressed: onDelete,
+                icon: const Icon(Icons.delete),
+              ),
+            ),
+            if ((buttons ?? {}).isNotEmpty)
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: FilledButton(
+                  onPressed: () async {
+                    await launchUrlString(buttons!["url"]);
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: getColorFromDbString(buttons?["color"]),
+                  ),
+                  child: Text(buttons?["text"]),
+                ),
+              )
+            else
+              const SizedBox()
           ],
         ),
       ),
