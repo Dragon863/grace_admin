@@ -2,6 +2,8 @@
 
 This is a flutter app to manage rotas for churches. It uses the supabase admin API. To adapt this for your own use you will need to create the appropriate tables, modify assets in the `assets/` directory and create a file in `lib/utils/constants.dart` to define the variables `anonKey` and `projectUrl`, as well as `serviceEmail` and `servicePassword` for a service account. This app is now in a ready to ship state, although it is intended to be built in a way that it is easily customisable to the needs of other use cases.
 
+( Hack club reviewers - yes this is eligible for arcade, as it is: not done for a job/commission, and is copmletely self-directed. Thank you! :) )
+
 ## Screenshots
 
 ![image](https://github.com/user-attachments/assets/658bd53a-4ae5-4ccb-8303-b1b6292a2254)
