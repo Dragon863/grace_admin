@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:grace_admin/pages/feed_page/preview/card.dart';
 import 'package:grace_admin/utils/api.dart';
 import 'package:provider/provider.dart';
@@ -50,6 +51,8 @@ class _PreviewFeedState extends State<PreviewFeed> {
                 constraints: const BoxConstraints(minWidth: 150, maxWidth: 700),
                 child: ListView.builder(
                   shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  scrollDirection: Axis.vertical,
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     final event = snapshot.data![index];

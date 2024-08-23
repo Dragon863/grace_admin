@@ -11,3 +11,13 @@ Future<void> showErr(BuildContext context, String err) async {
     ]),
   );
 }
+
+Future<void> showSuccess(BuildContext context, String text) async {
+  await ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(text),
+    duration: const Duration(seconds: 1),
+    backgroundColor: Colors.green,
+    behavior: SnackBarBehavior.floating,
+    width: 300,
+  ));
+}

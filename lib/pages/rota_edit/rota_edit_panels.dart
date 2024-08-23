@@ -68,6 +68,7 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
         // Delete with API
         final api = context.read<AuthAPI>();
         await api.client.from("roles").delete().eq("id", duty['row_id']);
+        _loadDutyCards();
       },
       id: duty["id"],
       row_id: duty["row_id"],
@@ -145,9 +146,9 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
       // Perform batch update
       try {
         await api.client.from("roles").upsert(dutiesData, onConflict: "id");
-        print("Duties saved successfully");
+        showSuccess(context, "Successfully saved");
       } catch (e) {
-        print("Error saving duties: $e");
+        showErr(context, "Error whilst saving: ${e.toString()}");
       }
     } catch (e) {
       showErr(context, "Error whilst saving: ${e.toString()}");
@@ -198,12 +199,14 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
                     Expanded(
                       child: SfDateRangePicker(
                         onSelectionChanged:
-                            (DateRangePickerSelectionChangedArgs args) {
+                            (DateRangePickerSelectionChangedArgs args) async {
                           selectedDate = args.value;
                           setState(() {
                             _dutyCards = [];
                             _loadDutyCards();
                           });
+                          _saveAllDuties();
+                          showSuccess(context, "Successfully saved");
                         },
                         selectionMode: DateRangePickerSelectionMode.single,
                         initialSelectedDate: DateTime.now(),
