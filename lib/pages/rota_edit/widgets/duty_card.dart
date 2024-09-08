@@ -73,7 +73,7 @@ class _DutyCardState extends State<DutyCard> {
                   onPressed: widget.onRemovePressed as void Function(),
                 ),
               ]),
-              Text(widget.description),
+              Flexible(child: Text(widget.description, softWrap: true)),
               const Divider(),
               DragTarget<List<String>>(
                 builder: (
