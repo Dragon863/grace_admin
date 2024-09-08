@@ -143,6 +143,13 @@ class _DashboardPageState extends State<DashboardPage> {
                       },
                       selected: false,
                     ),
+                    DashMenuItem(
+                        title: 'Print',
+                        iconData: Icons.print_outlined,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/print');
+                        },
+                        selected: false),
                   ],
                 ),
               ),
@@ -166,11 +173,13 @@ class _DashboardPageState extends State<DashboardPage> {
                             fontSize: 40,
                           ),
                         ),
-                        Text(
-                          " Welcome! Let's get started...",
-                          style: GoogleFonts.rubik(
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
+                        Flexible(
+                          child: Text(
+                            " Welcome! Let's get started...",
+                            style: GoogleFonts.rubik(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
@@ -190,7 +199,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ));
   }

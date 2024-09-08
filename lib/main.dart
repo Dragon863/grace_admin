@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:grace_admin/pages/dashboard/dashboard.dart';
 import 'package:grace_admin/pages/duty_library/duty_library.dart';
+import 'package:grace_admin/pages/print_page/print_page.dart';
 import 'package:grace_admin/pages/rota_edit/rota_edit_panels.dart';
 import 'package:grace_admin/pages/splash/splash.dart';
 import 'package:grace_admin/pages/feed_page/feed_page.dart';
@@ -34,13 +35,14 @@ class MyApp extends StatelessWidget {
       ),
       home: const SplashPage(),
       routes: {
-        '/splash': (context) => const SplashPage(),
-        '/home': (context) => const DashboardPage(),
+        '/splash':       (context) => const SplashPage(),
+        '/home':         (context) => const DashboardPage(),
         '/duty_library': (context) => const DutyLibraryPage(),
-        '/rota_edit': (context) => const PanelledRotaEditPage(),
-        '/users': (context) => const UsersPage(),
-        '/feed': (context) => const FeedPage(),
-        '/translate': (context) => const TranslatePage(),
+        '/rota_edit':    (context) => const PanelledRotaEditPage(),
+        '/users':        (context) => const UsersPage(),
+        '/feed':         (context) => const FeedPage(),
+        '/translate':    (context) => const TranslatePage(),
+        '/print':        (context) => const PrintPage(),
       },
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {
