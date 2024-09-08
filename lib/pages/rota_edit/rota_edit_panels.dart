@@ -169,6 +169,38 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
         backgroundColor: const Color.fromARGB(255, 32, 109, 156),
         // automaticallyImplyLeading: false,
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // Show a dialog to confirm if the user wants to save
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Save Changes?"),
+                    content: const Text(
+                        "Do you want to save changes before leaving?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        },
+                        child: const Text("No"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          _saveAllDuties();
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Yes"),
+                      ),
+                    ],
+                  );
+                });
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
