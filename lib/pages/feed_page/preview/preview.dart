@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:grace_admin/pages/feed_page/preview/card.dart';
 import 'package:grace_admin/utils/api.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +23,12 @@ class _PreviewFeedState extends State<PreviewFeed> {
     } else {
       return content!.reversed.toList();
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvents(false);
   }
 
   @override

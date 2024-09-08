@@ -24,9 +24,11 @@ class _FeedPageState extends State<FeedPage> {
   Icon deleteIcon = const Icon(Icons.delete, color: Colors.red);
   Icon attachTargetIcon = const Icon(Icons.attachment, color: Colors.black);
   List<String>? imageUrl;
+  DateTime? expiryDate;
   Map buttonsMap = {};
   Icon addButtonIcon = const Icon(Icons.add);
   Text addButtonText = const Text("Add a Button");
+  Text expiryDateText = const Text("Set expiry date");
 
   late Future<List<List<String>>> futureUrls;
   final TextEditingController titleController = TextEditingController();
@@ -81,7 +83,9 @@ class _FeedPageState extends State<FeedPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill out all fields'),
+          behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.red,
+          width: 400,
         ),
       );
       return;
@@ -94,12 +98,15 @@ class _FeedPageState extends State<FeedPage> {
           'image': imageUrl?[1],
           'datecreated': DateTime.now().toIso8601String(),
           'buttons': buttonsMap,
+          'dateexpired': expiryDate?.toIso8601String(),
         }
       ]);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Posted to feed successfully'),
           backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          width: 400,
         ),
       );
       titleController.clear();
@@ -357,6 +364,37 @@ class _FeedPageState extends State<FeedPage> {
                             label: addButtonText,
                           ),
                           const SizedBox(width: 4),
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              expiryDate = await showDatePicker(
+                                context: context,
+                                firstDate: DateTime(DateTime.now().year),
+                                lastDate: DateTime(DateTime.now().year + 5),
+                              );
+                              if (expiryDate != null) {
+                                setState(() {
+                                  expiryDateText = const Text("Date set!");
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.calendar_today, size: 18),
+                            label: expiryDateText,
+                          ),
+                          const SizedBox(width: 4),
+                          Visibility(
+                            visible: expiryDate != null,
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  expiryDate = null;
+                                  expiryDateText =
+                                      const Text("Set expiry date");
+                                });
+                              },
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
                           Visibility(
                             visible: buttonsMap.isNotEmpty,
                             child: IconButton(
@@ -522,7 +560,9 @@ class _FeedPageState extends State<FeedPage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Error uploading image: $error'),
+                  behavior: SnackBarBehavior.floating,
                   backgroundColor: Colors.red,
+                  width: 400,
                 ),
               );
             }

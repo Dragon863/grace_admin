@@ -36,6 +36,7 @@ class EventCard extends StatelessWidget {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             imageUrl != null
                 ? Stack(
@@ -65,44 +66,43 @@ class EventCard extends StatelessWidget {
                 : Container(),
             const SizedBox(height: 10),
             Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SelectableText(
-                  title,
-                  style: GoogleFonts.rubik(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                Flexible(
+                  child: SelectableText(
+                    title,
+                    style: GoogleFonts.rubik(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 SelectableText(
                   date,
                   style: GoogleFonts.rubik(
                     fontSize: 12,
                   ),
-                )
+                ),
               ],
             ),
             const SizedBox(height: 5),
-            subtext == null
-                ? Container()
-                : Row(
-                    children: [
-                      Linkify(
-                        text: subtext!,
-                        onOpen: (link) async {
-                          if (await canLaunchUrlString(link.url)) {
-                            await launchUrlString(link.url);
-                          } else {
-                            throw 'Could not launch $link';
-                          }
-                        },
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      const Spacer(),
-                    ],
-                  ),
+            if (subtext == null)
+              Container()
+            else
+              Linkify(
+                text: subtext!,
+                onOpen: (link) async {
+                  if (await canLaunchUrlString(link.url)) {
+                    await launchUrlString(link.url);
+                  } else {
+                    throw 'Could not launch $link';
+                  }
+                },
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                ),
+              ),
             const SizedBox(height: 6),
             Align(
               alignment: Alignment.bottomRight,

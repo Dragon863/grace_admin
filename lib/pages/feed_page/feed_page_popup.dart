@@ -76,6 +76,9 @@ class _FeedPagePopupState extends State<FeedPagePopup> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text("Error: please fill out all fields."),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Colors.red,
+                  width: 400,
                 ),
               );
               Navigator.of(context).pop(null);

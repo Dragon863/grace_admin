@@ -102,6 +102,8 @@ Future<List<Widget>> searchUsers(
                             .showSnackBar(const SnackBar(
                           content: Text(
                               'Service key error - please log out and log back in'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.red,
                         ));
                         return;
                       }
@@ -121,11 +123,15 @@ Future<List<Widget>> searchUsers(
                             Clipboard.setData(ClipboardData(text: newPassword));
                           },
                         ),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.green,
                       ));
                       searchUsers(searchTerm, api, context);
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text('Error: $e'),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.red,
                       ));
                       searchUsers(searchTerm, api, context);
                     }
@@ -159,6 +165,8 @@ Future<List<Widget>> searchUsers(
                                         .showSnackBar(const SnackBar(
                                       content: Text(
                                           'Service key error - please log out and log back in'),
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: Colors.red,
                                     ));
                                     return;
                                   }
@@ -236,6 +244,8 @@ Future<List<Widget>> searchUsers(
                           ));
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text('${user[0]} renamed to $newName'),
+                        behavior: SnackBarBehavior.floating,
+                        width: 400,
                       ));
                       searchUsers(searchTerm, api, context);
                     } catch (e) {
