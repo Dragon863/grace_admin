@@ -130,7 +130,7 @@ class _PanelledRotaEditPageState extends State<PanelledRotaEditPage> {
   void _saveAllDuties() async {
     try {
       final api = context.read<AuthAPI>();
-      print("Saving duties");
+      // print("Saving duties");
 
       // Collect all duty data
       List<Map<String, dynamic>> dutiesData = _dutyCards.map((card) {
